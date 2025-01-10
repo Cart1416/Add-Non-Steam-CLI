@@ -5,6 +5,7 @@ import requests
 import zlib
 from pathlib import Path
 import platform
+from PIL import Image
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -87,16 +88,32 @@ def fetch_steamgriddb_image(api_key, game_id, image_type):
     logger.error(f"Failed to fetch {image_type} for game ID: {game_id}")
     return None
 
+def resize_image(image_path, dimensions):
+    """Resize an image to the specified dimensions."""
+    try:
+        with Image.open(image_path) as img:
+            img = img.convert("RGBA").resize(dimensions, Image.ANTIALIAS)
+            img.save(image_path, format="PNG")
+            logger.info(f"Resized image to {dimensions} and saved: {image_path}")
+    except Exception as e:
+        logger.error(f"Failed to resize image {image_path}: {e}")
 
-def download_image(url, local_path):
-    """Download an image from URL and save it locally."""
+def download_image(url, local_path, resize_to=None):
+    """Download an image from URL and save it locally, optionally resizing."""
     try:
         response = requests.get(url)
         if response.status_code == 200:
             with open(local_path, 'wb') as f:
                 f.write(response.content)
             logger.info(f"Downloaded image from {url} to {local_path}")
+
+            # Resize the image if required
+            if resize_to:
+                resize_image(local_path, resize_to)
+
             return True
+        else:
+            logger.error(f"Failed to download image: {url}, Status Code: {response.status_code}")
     except Exception as e:
         logger.error(f"Failed to download image from {url}: {e}")
     return False
@@ -122,17 +139,16 @@ def save_images_to_grid(api_key, app_id, user_id, game_name):
                     extension = os.path.splitext(url)[1]
                     if image_type == "grid":
                         image_path = os.path.join(grid_folder, f"{app_id}p{extension}")
+                        download_image(url, image_path)
                     elif image_type == "hero":
                         image_path = os.path.join(grid_folder, f"{app_id}_hero{extension}")
+                        download_image(url, image_path)
                     elif image_type == "logo":
                         image_path = os.path.join(grid_folder, f"{app_id}_logo{extension}")
+                        download_image(url, image_path)
                     elif image_type == "icon":
-                        image_path = os.path.join(grid_folder, f"{app_id}_icon{extension}")
-                    else:
-                        continue
-
-                    if download_image(url, image_path):
-                        logger.info(f"Saved {image_type} image for {game_name} to {image_path}")
+                        image_path = os.path.join(grid_folder, f"{app_id}_icon.png")
+                        download_image(url, image_path, resize_to=(64, 64))  # Resize icons
 
 
 def add_non_steam_game():
