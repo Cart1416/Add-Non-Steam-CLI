@@ -69,12 +69,22 @@ def select_steam_user():
 def fetch_steamgriddb_image(api_key, game_id, image_type):
     """Fetch a single image (first available) of specified type from SteamGridDB."""
     headers = {'Authorization': f'Bearer {api_key}'}
-    url = f'https://www.steamgriddb.com/api/v2/{image_type}s/game/{game_id}'
-    response = requests.get(url, headers=headers)
+    
+    # Handle special pluralization for "hero"
+    if image_type == 'hero':
+        api_type = 'heroes'
+    else:
+        api_type = f"{image_type}s"
+
+    base_url = f"https://www.steamgriddb.com/api/v2/{api_type}/game/{game_id}"
+    response = requests.get(base_url, headers=headers)
+
+    logger.info(f"Fetching {image_type} for game ID: {game_id}, URL: {base_url}, Status Code: {response.status_code}")
     if response.status_code == 200:
         data = response.json()
         if data['success'] and data['data']:
-            return data['data'][0]['url']
+            return data['data'][0]['url']  # Return the URL of the first image found
+    logger.error(f"Failed to fetch {image_type} for game ID: {game_id}")
     return None
 
 
