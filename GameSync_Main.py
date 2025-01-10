@@ -88,11 +88,12 @@ def fetch_steamgriddb_image(api_key, game_id, image_type):
     logger.error(f"Failed to fetch {image_type} for game ID: {game_id}")
     return None
 
+
 def resize_image(image_path, dimensions):
     """Resize an image to the specified dimensions."""
     try:
         with Image.open(image_path) as img:
-            img = img.convert("RGBA").resize(dimensions, Image.ANTIALIAS)
+            img = img.convert("RGBA").resize(dimensions, Image.Resampling.LANCZOS)
             img.save(image_path, format="PNG")
             logger.info(f"Resized image to {dimensions} and saved: {image_path}")
     except Exception as e:
