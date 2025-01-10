@@ -93,11 +93,11 @@ def download_image(url, local_path):
 
 
 def save_images_to_grid(api_key, app_id, user_id, game_name):
-    """Save grid, hero, and logo images for the game to the correct Steam grid folder."""
+    """Save grid, hero, logo, and icon images for the game to the correct Steam grid folder."""
     grid_folder = os.path.join(steam_user_data_path, user_id, "config", "grid")
     Path(grid_folder).mkdir(parents=True, exist_ok=True)
 
-    image_types = ['grid', 'hero', 'logo']
+    image_types = ['grid', 'hero', 'logo', 'icon']
     for image_type in image_types:
         headers = {'Authorization': f'Bearer {api_key}'}
         search_url = f"https://www.steamgriddb.com/api/v2/search/autocomplete/{game_name}"
@@ -116,6 +116,8 @@ def save_images_to_grid(api_key, app_id, user_id, game_name):
                         image_path = os.path.join(grid_folder, f"{app_id}_hero{extension}")
                     elif image_type == "logo":
                         image_path = os.path.join(grid_folder, f"{app_id}_logo{extension}")
+                    elif image_type == "icon":
+                        image_path = os.path.join(grid_folder, f"{app_id}_icon{extension}")
                     else:
                         continue
 
