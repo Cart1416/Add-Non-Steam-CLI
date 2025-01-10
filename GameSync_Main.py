@@ -170,14 +170,6 @@ def add_non_steam_game():
             "tags": {},
         }
 
-        # Add artwork paths to the shortcut entry
-        if "grid" in image_paths:
-            new_entry["grid_image_path"] = image_paths["grid"]
-        if "hero" in image_paths:
-            new_entry["hero_image_path"] = image_paths["hero"]
-        if "logo" in image_paths:
-            new_entry["logo_image_path"] = image_paths["logo"]
-
         shortcuts['shortcuts'][str(len(shortcuts['shortcuts']))] = new_entry
 
         # Write updated shortcuts back to file
