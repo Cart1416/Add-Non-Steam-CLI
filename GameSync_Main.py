@@ -95,6 +95,7 @@ def download_image(url, local_path):
 def save_images(api_key, app_id, game_name):
     """Save grid, hero, and logo images for the game."""
     image_types = ['grid', 'hero', 'logo']
+    image_paths = {}
     for image_type in image_types:
         search_url = f"https://www.steamgriddb.com/api/v2/search/autocomplete/{game_name}"
         headers = {'Authorization': f'Bearer {api_key}'}
@@ -107,13 +108,16 @@ def save_images(api_key, app_id, game_name):
                 if url:
                     extension = os.path.splitext(url)[1]
                     image_path = os.path.join(grid_folder, f'{app_id}_{image_type}{extension}')
-                    download_image(url, image_path)
+                    if download_image(url, image_path):
+                        image_paths[image_type] = image_path
+    return image_paths
 
 
 def add_non_steam_game():
     """Add a non-Steam game to the selected Steam account."""
     game_path = input("Enter the path to your game\n> ").strip()
     game_name = input("Enter the name of the game\n> ").strip()
+    launch_options = input("Enter any launch options or press Enter to skip\n> ").strip()
 
     if not os.path.exists(game_path):
         logger.error(f"Game path does not exist: {game_path}")
@@ -136,29 +140,39 @@ def add_non_steam_game():
         else:
             shortcuts = {'shortcuts': {}}
 
+        # Save images and get paths
+        image_paths = save_images(api_key, app_id, game_name) if api_key else {}
+
+        # Create new entry
         new_entry = {
             "appid": app_id,
             "appname": game_name,
             "exe": f'"{game_path}"',
             "StartDir": f'"{os.path.dirname(game_path)}"',
-            "LaunchOptions": "",
+            "LaunchOptions": launch_options,
             "IsHidden": 0,
             "AllowDesktopConfig": 1,
             "OpenVR": 0,
             "Devkit": 0,
             "DevkitGameID": "",
             "LastPlayTime": 0,
-            "tags": {}
+            "tags": {},
         }
 
+        # Add artwork paths to the shortcut entry
+        if "grid" in image_paths:
+            new_entry["grid_image_path"] = image_paths["grid"]
+        if "hero" in image_paths:
+            new_entry["hero_image_path"] = image_paths["hero"]
+        if "logo" in image_paths:
+            new_entry["logo_image_path"] = image_paths["logo"]
+
         shortcuts['shortcuts'][str(len(shortcuts['shortcuts']))] = new_entry
+
+        # Write updated shortcuts back to file
         with open(shortcuts_file, 'wb') as f:
             vdf.binary_dump(shortcuts, f)
-            logger.info(f"Added game '{game_name}' to Steam user {user_id}.")
-
-        # Fetch and save images if API key is provided
-        if api_key:
-            save_images(api_key, app_id, game_name)
+            logger.info(f"Added game '{game_name}' with artwork to Steam user {user_id}.")
 
     except Exception as e:
         logger.error(f"Failed to update shortcuts: {e}")
