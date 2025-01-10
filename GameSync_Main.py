@@ -92,14 +92,17 @@ def download_image(url, local_path):
     return False
 
 
-def save_images(api_key, app_id, game_name):
-    """Save grid, hero, and logo images for the game."""
+def save_images_to_grid(api_key, app_id, user_id, game_name):
+    """Save grid, hero, and logo images for the game to the correct Steam grid folder."""
+    grid_folder = os.path.join(steam_user_data_path, user_id, "config", "grid")
+    Path(grid_folder).mkdir(parents=True, exist_ok=True)
+
     image_types = ['grid', 'hero', 'logo']
-    image_paths = {}
     for image_type in image_types:
-        search_url = f"https://www.steamgriddb.com/api/v2/search/autocomplete/{game_name}"
         headers = {'Authorization': f'Bearer {api_key}'}
+        search_url = f"https://www.steamgriddb.com/api/v2/search/autocomplete/{game_name}"
         response = requests.get(search_url, headers=headers)
+
         if response.status_code == 200:
             data = response.json()
             if data['success']:
@@ -107,10 +110,17 @@ def save_images(api_key, app_id, game_name):
                 url = fetch_steamgriddb_image(api_key, game_id, image_type)
                 if url:
                     extension = os.path.splitext(url)[1]
-                    image_path = os.path.join(grid_folder, f'{app_id}_{image_type}{extension}')
+                    if image_type == "grid":
+                        image_path = os.path.join(grid_folder, f"{app_id}p{extension}")
+                    elif image_type == "hero":
+                        image_path = os.path.join(grid_folder, f"{app_id}_hero{extension}")
+                    elif image_type == "logo":
+                        image_path = os.path.join(grid_folder, f"{app_id}_logo{extension}")
+                    else:
+                        continue
+
                     if download_image(url, image_path):
-                        image_paths[image_type] = image_path
-    return image_paths
+                        logger.info(f"Saved {image_type} image for {game_name} to {image_path}")
 
 
 def add_non_steam_game():
@@ -130,6 +140,10 @@ def add_non_steam_game():
 
     api_key = input("Specify a SteamGridDB API key or press Enter to skip.\n> ").strip()
     app_id = generate_appid(game_name, game_path)
+    
+    # Save images to the Steam grid folder
+    if api_key:
+        save_images_to_grid(api_key, app_id, user_id, game_name)
 
     # Generate or update shortcuts
     shortcuts_file = os.path.join(steam_user_data_path, user_id, "config", "shortcuts.vdf")
@@ -139,9 +153,6 @@ def add_non_steam_game():
                 shortcuts = vdf.binary_load(f)
         else:
             shortcuts = {'shortcuts': {}}
-
-        # Save images and get paths
-        image_paths = save_images(api_key, app_id, game_name) if api_key else {}
 
         # Create new entry
         new_entry = {
