@@ -10,6 +10,15 @@ import zlib
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
+# Determine OS and set the correct Steam user data path
+if platform.system() == "Windows":
+    steam_user_data_path = os.path.join("C:\\Program Files (x86)\\Steam\\userdata")
+elif platform.system() == "Linux":
+    steam_user_data_path = os.path.expanduser("~/.steam/steam/userdata")
+else:
+    logger.error("Unsupported operating system.")
+    exit(1)
+
 class NonSteamGameAdder:
     def __init__(self, game_exe_path, game_name, steam_user_data_path, steamgriddb_api_key, user_id, launch_options='', steam_dir=None):
         self.game_exe_path = game_exe_path
