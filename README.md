@@ -11,8 +11,8 @@ A python script to add non-steam games to your Steam library with artwork from s
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/non-steam-game-adder.git
-   cd non-steam-game-adder
+   git clone https://github.com/Cart1416/Add-Non-Steam-CLI.git
+   cd Add-Non-Steam-CLI
 
 2. Install dependencies:
 
