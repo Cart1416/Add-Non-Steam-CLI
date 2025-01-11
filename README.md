@@ -53,6 +53,7 @@ adder.add_non_steam_game(
 
 Dependencies
 
+```
 Python 3.7+
 
 requests
@@ -60,6 +61,7 @@ requests
 pillow
 
 vdf
+```
 
 
 Notes
