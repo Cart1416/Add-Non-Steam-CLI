@@ -22,12 +22,7 @@ else:
 
 class NonSteamGameAdder:
     def __init__(self, steamgriddb_api_key=None, steam_dir=None):
-        self.game_exe_path = game_exe_path
-        self.game_name = game_name
-        self.steam_user_data_path = steam_user_data_path
         self.steamgriddb_api_key = steamgriddb_api_key
-        self.user_id = user_id
-        self.launch_options = launch_options
         self.steam_dir = steam_dir or steam_user_data_path
         self.grid_folder = os.path.join(self.steam_user_data_path, self.user_id, "config", "grid")
 
@@ -124,9 +119,9 @@ class NonSteamGameAdder:
 
     def add_non_steam_game(self, game_exe_path, game_name, user_id, launch_options='', ):
         """Add a non-Steam game to the Steam shortcuts."""
-        exe_path = self.game_exe_path
-        game_name = self.game_name
-        app_id = self.generate_appid(game_name, exe_path)
+        exe_path = game_exe_path
+        game_name = game_name
+        app_id = generate_appid(game_name, exe_path)
         game_path = os.path.dirname(exe_path)
 
         # Fetch images from SteamGridDB
@@ -139,7 +134,7 @@ class NonSteamGameAdder:
                 self.save_images_to_grid(app_id, game_id)
 
         # Update Steam shortcut (VDF file)
-        shortcuts_file = os.path.join(self.steam_user_data_path, self.user_id, 'config', 'shortcuts.vdf')
+        shortcuts_file = os.path.join(self.steam_user_data_path, user_id, 'config', 'shortcuts.vdf')
         try:
             if os.path.exists(shortcuts_file):
                 with open(shortcuts_file, 'rb') as f:
@@ -152,7 +147,7 @@ class NonSteamGameAdder:
                 "appname": game_name,
                 "exe": f'"{exe_path}"',
                 "StartDir": f'"{game_path}"',
-                "LaunchOptions": self.launch_options,
+                "LaunchOptions": launch_options,
                 "IsHidden": 0,
                 "AllowDesktopConfig": 1,
                 "OpenVR": 0,
