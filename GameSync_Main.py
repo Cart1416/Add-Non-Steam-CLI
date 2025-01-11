@@ -28,7 +28,7 @@ class NonSteamGameAdder:
         self.steamgriddb_api_key = steamgriddb_api_key
         self.user_id = user_id
         self.launch_options = launch_options
-        self.steam_dir = steam_dir or "C:\\Program Files (x86)\\Steam"  # Default for Windows, change for Linux if needed
+        self.steam_dir = steam_dir or steam_user_data_path
         self.grid_folder = os.path.join(self.steam_user_data_path, self.user_id, "config", "grid")
 
         # Ensure the grid folder exists
@@ -215,7 +215,7 @@ def main():
         steamgriddb_api_key = input("Specify a SteamGridDB API key or press Enter to skip.\n> ").strip()
 
         # Add the non-Steam game using NonSteamGameAdder class
-        game_adder = NonSteamGameAdder(game_exe_path, game_name, selected_user, steamgriddb_api_key, launch_options)
+        game_adder = NonSteamGameAdder(game_exe_path, game_name, steam_user_data_path, steamgriddb_api_key, selected_user, launch_options)
         game_adder.add_non_steam_game()
 
     except Exception as e:
