@@ -99,7 +99,7 @@ class NonSteamGameAdder:
                 else:
                     self.download_image(url, image_path)
     
-    def get_local_steam_usernames():
+    def get_local_steam_usernames(self):
         """Get Steam usernames from local Steam files."""
         user_ids = [d for d in os.listdir(steam_user_data_path) if os.path.isdir(os.path.join(steam_user_data_path, d))]
         usernames = {}
