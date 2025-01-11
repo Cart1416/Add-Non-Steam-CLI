@@ -20,7 +20,7 @@ pip install -r requirements.txt
 
 
 
-##Usage
+## Usage
 
 CLI
 
@@ -34,6 +34,7 @@ Module
 
 Use the script in your own projects:
 
+``` python
 from non_steam_game_adder import NonSteamGameAdder
 
 adder = NonSteamGameAdder(
