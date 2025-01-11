@@ -103,6 +103,24 @@ class NonSteamGameAdder:
                     self.download_image(url, image_path, resize_to=(64, 64))  # Resize icons
                 else:
                     self.download_image(url, image_path)
+    
+    def get_local_steam_usernames():
+        """Get Steam usernames from local Steam files."""
+        user_ids = [d for d in os.listdir(steam_user_data_path) if os.path.isdir(os.path.join(steam_user_data_path, d))]
+        usernames = {}
+        for user_id in user_ids:
+            localconfig_path = os.path.join(steam_user_data_path, user_id, "config", "localconfig.vdf")
+            if os.path.exists(localconfig_path):
+                try:
+                    with open(localconfig_path, 'r') as f:
+                        data = vdf.load(f)
+                        username = data.get("UserLocalConfigStore", {}).get("friends", {}).get("PersonaName", "Unknown")
+                        usernames[user_id] = username
+                except Exception as e:
+                    logger.error(f"Failed to parse {localconfig_path}: {e}")
+            else:
+                usernames[user_id] = "Unknown"
+        return usernames
 
     def add_non_steam_game(self):
         """Add a non-Steam game to the Steam shortcuts."""
