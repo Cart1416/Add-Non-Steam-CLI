@@ -142,41 +142,53 @@ class NonSteamGameAdder:
         except Exception as e:
             logger.error(f"Failed to update shortcuts: {e}")
 
-# Standalone function for command-line use
+def select_steam_user():
+    """Prompt the user to select a Steam account."""
+    usernames = get_local_steam_usernames()  # This function should return a dictionary of user IDs and usernames
+    if not usernames:
+        logger.error("No Steam users found.")
+        return None
+
+    print("Multiple Users Detected! Select a user:")
+    for i, (user_id, username) in enumerate(usernames.items(), start=1):
+        print(f"{i}. {username} ({user_id})")
+
+    while True:
+        try:
+            selection = int(input("> "))
+            if 1 <= selection <= len(usernames):
+                selected_user_id = list(usernames.keys())[selection - 1]
+                logger.info(f"Selected user: {usernames[selected_user_id]} ({selected_user_id})")
+                return selected_user_id
+        except ValueError:
+            pass
+        print("Invalid selection. Please enter a valid number.")
+
 def main():
-    """Main function to interact with the user and add a non-Steam game."""
+    """Main function to add a non-Steam game."""
     try:
-        # CLI inputs
-        game_exe_path = input("Enter the path to your game executable:\n> ")
-        game_name = input("Enter the name of the game:\n> ")
-        launch_options = input("Enter any launch options or press Enter to skip:\n> ")
+        # Collect game details
+        game_exe_path = input("Enter the path to your game\n> ").strip()
+        game_name = input("Enter the name of the game\n> ").strip()
+        launch_options = input("Enter any launch options or press Enter to skip\n> ").strip()
 
-        steam_user_data_path = input("Enter the path to your Steam userdata folder:\n> ")
-        
-        # Get multiple users if detected
-        users = []
-        users_folder = Path(steam_user_data_path).glob("*/config")
-        for folder in users_folder:
-            users.append(folder.parts[-3])
+        # Validate the game path
+        if not os.path.exists(game_exe_path):
+            logger.error(f"Game path does not exist: {game_exe_path}")
+            return
 
-        if len(users) > 1:
-            print("Multiple Users Detected! Select a user:")
-            for idx, user in enumerate(users, start=1):
-                print(f"{idx}. {user} ({folder.parts[-3]})")
-            selected_user_idx = int(input("> ")) - 1
-            user_id = users[selected_user_idx]
-        else:
-            user_id = users[0]
+        # Select Steam user profile
+        selected_user = select_steam_user()
+        if not selected_user:
+            logger.error("No valid user selected. Exiting.")
+            return
 
-        logger.info(f"Selected user: {user_id}")
+        # Specify the SteamGridDB API key
+        steamgriddb_api_key = input("Specify a SteamGridDB API key or press Enter to skip.\n> ").strip()
 
-        steamgriddb_api_key = input("Specify a SteamGridDB API key or press Enter to skip.\n> ")
-
-        # Initialize the game adder
-        game_adder = NonSteamGameAdder(game_exe_path, game_name, steam_user_data_path, steamgriddb_api_key, user_id, launch_options)
-
-        # Add the non-Steam game
-        game_adder.add_non_steam_game()
+        # Add the non-Steam game using NonSteamGameAdder class
+        game_adder = NonSteamGameAdder(game_exe_path, game_name, selected_user, steamgriddb_api_key, launch_options)
+        game_adder.add_game()
 
     except Exception as e:
         logger.error(f"Unexpected error in main function: {e}")
