@@ -5,6 +5,7 @@ from pathlib import Path
 from PIL import Image
 import vdf
 import zlib
+import platform
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
