@@ -21,7 +21,7 @@ else:
     exit(1)
 
 class NonSteamGameAdder:
-    def __init__(self, game_exe_path, game_name, steam_user_data_path, steamgriddb_api_key, user_id, launch_options='', steam_dir=None):
+    def __init__(self, steamgriddb_api_key=None, steam_dir=None):
         self.game_exe_path = game_exe_path
         self.game_name = game_name
         self.steam_user_data_path = steam_user_data_path
@@ -122,7 +122,7 @@ class NonSteamGameAdder:
                 usernames[user_id] = "Unknown"
         return usernames
 
-    def add_non_steam_game(self):
+    def add_non_steam_game(self, game_exe_path, game_name, user_id, launch_options='', ):
         """Add a non-Steam game to the Steam shortcuts."""
         exe_path = self.game_exe_path
         game_name = self.game_name
@@ -233,8 +233,8 @@ def main():
         steamgriddb_api_key = input("Specify a SteamGridDB API key or press Enter to skip.\n> ").strip()
 
         # Add the non-Steam game using NonSteamGameAdder class
-        game_adder = NonSteamGameAdder(game_exe_path, game_name, steam_user_data_path, steamgriddb_api_key, selected_user, launch_options)
-        game_adder.add_non_steam_game()
+        game_adder = NonSteamGameAdder(steamgriddb_api_key)
+        game_adder.add_non_steam_game(game_exe_path, game_name, selected_user, launch_options)
 
     except Exception as e:
         logger.error(f"Unexpected error in main function: {e}")
