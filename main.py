@@ -83,7 +83,7 @@ class NonSteamGameAdder:
         return None
 
     def save_images_to_grid(self, app_id, game_id, user_id):
-        grid_folder = os.path.join(steam_user_data_path, self.user_id, "config", "grid")
+        grid_folder = os.path.join(steam_user_data_path, user_id, "config", "grid")
 
         # Ensure the grid folder exists
         Path(grid_folder).mkdir(parents=True, exist_ok=True)
