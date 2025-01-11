@@ -24,7 +24,7 @@ class NonSteamGameAdder:
     def __init__(self, steamgriddb_api_key=None, steam_dir=None):
         self.steamgriddb_api_key = steamgriddb_api_key
         self.steam_dir = steam_dir or steam_user_data_path
-        self.grid_folder = os.path.join(self.steam_user_data_path, self.user_id, "config", "grid")
+        self.grid_folder = os.path.join(steam_user_data_path, self.user_id, "config", "grid")
 
         # Ensure the grid folder exists
         Path(self.grid_folder).mkdir(parents=True, exist_ok=True)
