@@ -134,7 +134,7 @@ class NonSteamGameAdder:
                 self.save_images_to_grid(app_id, game_id)
 
         # Update Steam shortcut (VDF file)
-        shortcuts_file = os.path.join(self.steam_user_data_path, user_id, 'config', 'shortcuts.vdf')
+        shortcuts_file = os.path.join(steam_user_data_path, user_id, 'config', 'shortcuts.vdf')
         try:
             if os.path.exists(shortcuts_file):
                 with open(shortcuts_file, 'rb') as f:
