@@ -216,7 +216,7 @@ def main():
 
         # Add the non-Steam game using NonSteamGameAdder class
         game_adder = NonSteamGameAdder(game_exe_path, game_name, selected_user, steamgriddb_api_key, launch_options)
-        game_adder.add_game()
+        game_adder.add_non_steam_game()
 
     except Exception as e:
         logger.error(f"Unexpected error in main function: {e}")
