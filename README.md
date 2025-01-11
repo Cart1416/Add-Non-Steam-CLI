@@ -49,6 +49,7 @@ adder.add_non_steam_game(
     user_id="12345678",
     launch_options=""
 )
+```
 
 Dependencies
 
