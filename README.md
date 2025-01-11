@@ -40,7 +40,6 @@ make sure main.py is renamed to something like module.py and in the same directo
 from module import NonSteamGameAdder
 
 adder = NonSteamGameAdder(
-    steam_user_data_path="~/.steam/steam/userdata",
     steamgriddb_api_key="your_api_key_here"
 )
 adder.fetch_steamgriddb_image(self, game_id, image_type)
