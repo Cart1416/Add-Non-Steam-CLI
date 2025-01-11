@@ -24,10 +24,6 @@ class NonSteamGameAdder:
     def __init__(self, steamgriddb_api_key=None, steam_dir=None):
         self.steamgriddb_api_key = steamgriddb_api_key
         self.steam_dir = steam_dir or steam_user_data_path
-        self.grid_folder = os.path.join(steam_user_data_path, self.user_id, "config", "grid")
-
-        # Ensure the grid folder exists
-        Path(self.grid_folder).mkdir(parents=True, exist_ok=True)
 
     def generate_appid(self, game_name, exe_path):
         """Generate a unique appid for the game based on its exe path and name."""
@@ -86,14 +82,18 @@ class NonSteamGameAdder:
         logger.error(f"Failed to fetch {image_type} for game ID: {game_id}")
         return None
 
-    def save_images_to_grid(self, app_id, game_id):
+    def save_images_to_grid(self, app_id, game_id, user_id):
+        grid_folder = os.path.join(steam_user_data_path, self.user_id, "config", "grid")
+
+        # Ensure the grid folder exists
+        Path(grid_folder).mkdir(parents=True, exist_ok=True)
         """Save grid, hero, logo, and icon images for the game to the correct Steam grid folder."""
         image_types = ['grid', 'hero', 'logo', 'icon']
         for image_type in image_types:
             url = self.fetch_steamgriddb_image(game_id, image_type)
             if url:
                 extension = os.path.splitext(url)[1]
-                image_path = os.path.join(self.grid_folder, f"{app_id}_{image_type}{extension}")
+                image_path = os.path.join(grid_folder, f"{app_id}_{image_type}{extension}")
                 if image_type == "icon":
                     self.download_image(url, image_path, resize_to=(64, 64))  # Resize icons
                 else:
@@ -131,7 +131,7 @@ class NonSteamGameAdder:
             data = response.json()
             if data['success']:
                 game_id = data['data'][0]['id']  # Assuming first result is the best match
-                self.save_images_to_grid(app_id, game_id)
+                self.save_images_to_grid(app_id, game_id, user_id)
 
         # Update Steam shortcut (VDF file)
         shortcuts_file = os.path.join(steam_user_data_path, user_id, 'config', 'shortcuts.vdf')
