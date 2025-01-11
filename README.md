@@ -34,8 +34,10 @@ Module
 
 Use the script in your own projects:
 
+make sure main.py is renamed to something like module.py and in the same directory
+
 ``` python
-from Add-Non-Steam-CLI import NonSteamGameAdder
+from module import NonSteamGameAdder
 
 adder = NonSteamGameAdder(
     steam_user_data_path="~/.steam/steam/userdata",
