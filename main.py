@@ -121,7 +121,7 @@ class NonSteamGameAdder:
         """Add a non-Steam game to the Steam shortcuts."""
         exe_path = game_exe_path
         game_name = game_name
-        app_id = generate_appid(game_name, exe_path)
+        app_id = self.generate_appid(game_name, exe_path)
         game_path = os.path.dirname(exe_path)
 
         # Fetch images from SteamGridDB
