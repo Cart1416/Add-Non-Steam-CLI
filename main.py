@@ -98,7 +98,7 @@ class NonSteamGameAdder:
                     self.download_image(url, image_path, resize_to=(64, 64))  # Resize icons
                 else:
                     self.download_image(url, image_path)
-    
+
     def get_local_steam_usernames(self):
         """Get Steam usernames from local Steam files."""
         user_ids = [d for d in os.listdir(steam_user_data_path) if os.path.isdir(os.path.join(steam_user_data_path, d))]
@@ -116,6 +116,24 @@ class NonSteamGameAdder:
             else:
                 usernames[user_id] = "Unknown"
         return usernames
+
+    def get_current_steam_user(self):
+        """Get the currently logged-in Steam user."""
+        loginusers_path = os.path.join(self.steam_dir, '..', 'config', 'loginusers.vdf')
+        if not os.path.exists(loginusers_path):
+            raise FileNotFoundError("Could not find loginusers.vdf. Check the Steam directory path.")
+
+        with open(loginusers_path, 'r', encoding='utf-8') as file:
+            data = vdf.load(file)
+
+        for user_id, user_info in data.get('users', {}).items():
+            if user_info.get('MostRecent') == "1":
+                return {
+                    'steamid': user_id,
+                    'account_name': user_info.get('AccountName'),
+                    'persona_name': user_info.get('PersonaName'),
+                }
+        return None
 
     def add_non_steam_game(self, game_exe_path, game_name, user_id, launch_options='', ):
         """Add a non-Steam game to the Steam shortcuts."""
