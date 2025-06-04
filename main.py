@@ -94,6 +94,8 @@ class NonSteamGameAdder:
             if url:
                 extension = os.path.splitext(url)[1]
                 image_path = os.path.join(grid_folder, f"{app_id}_{image_type}{extension}")
+                if image_type == "grid":
+                    image_path = os.path.join(grid_folder, f"{app_id}p{extension}")
                 if image_type == "icon":
                     self.download_image(url, image_path, resize_to=(64, 64))  # Resize icons
                 else:
