@@ -182,7 +182,7 @@ class NonSteamGameAdder:
                 vdf.binary_dump(shortcuts, f)
             logger.info(f"Added game {game_name} to Steam shortcuts.")
 
-        return {"status": "success", "app_id": app_id}
+            return {"status": "success", "app_id": app_id}
 
         except Exception as e:
             logger.error(f"Failed to update shortcuts: {e}")
