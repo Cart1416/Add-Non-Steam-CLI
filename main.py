@@ -66,10 +66,15 @@ class NonSteamGameAdder:
         headers = {
             'Authorization': f'Bearer {self.steamgriddb_api_key}'
         }
+
+        # Choose base URL
         if image_type == 'hero':
             base_url = f'https://www.steamgriddb.com/api/v2/heroes/game/{game_id}'
         elif image_type == 'icon':
             base_url = f'https://www.steamgriddb.com/api/v2/icons/game/{game_id}'
+        elif image_type == 'wide_grid':
+            # Use the grids endpoint with filters for wide resolution
+            base_url = f'https://www.steamgriddb.com/api/v2/grids/game/{game_id}?dimensions=920x430'
         else:
             base_url = f'https://www.steamgriddb.com/api/v2/{image_type}s/game/{game_id}'
 
@@ -87,15 +92,19 @@ class NonSteamGameAdder:
 
         # Ensure the grid folder exists
         Path(grid_folder).mkdir(parents=True, exist_ok=True)
-        """Save grid, hero, logo, and icon images for the game to the correct Steam grid folder."""
-        image_types = ['grid', 'hero', 'logo', 'icon']
+        """Save grid, wide_grid, hero, logo, and icon images for the game to the correct Steam grid folder."""
+        image_types = ['grid', 'wide_grid', 'hero', 'logo', 'icon']
         for image_type in image_types:
             url = self.fetch_steamgriddb_image(game_id, image_type)
             if url:
                 extension = os.path.splitext(url)[1]
-                image_path = os.path.join(grid_folder, f"{app_id}_{image_type}{extension}")
                 if image_type == "grid":
                     image_path = os.path.join(grid_folder, f"{app_id}p{extension}")
+                elif image_type == "wide_grid":
+                    image_path = os.path.join(grid_folder, f"{app_id}{extension}")
+                else:
+                    image_path = os.path.join(grid_folder, f"{app_id}_{image_type}{extension}")
+
                 if image_type == "icon":
                     self.download_image(url, image_path, resize_to=(64, 64))  # Resize icons
                 else:
